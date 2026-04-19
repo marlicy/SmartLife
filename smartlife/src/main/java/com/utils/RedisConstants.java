@@ -1,0 +1,27 @@
+package com.utils;
+
+public class RedisConstants {
+
+    private RedisConstants() {
+    }
+
+    public static final String LOGIN_CODE_KEY = "login:code:";
+    public static final Long LOGIN_CODE_TTL = 3L;
+    public static final String LOGIN_USER_KEY = "login:token:";
+    public static final Long LOGIN_USER_TTL = 30L;
+
+    public static final Long CACHE_NULL_TTL = 2L;
+    public static final Long CACHE_SHOP_TTL = 30L;
+    public static final String CACHE_SHOP_KEY = "cache:shop:";
+    public static final String CACHE_SHOP_LOCAL_KEY = "local:shop:";
+
+    public static final String LOCK_SHOP_KEY = "lock:shop:";
+    public static final Long LOCK_SHOP_TTL = 10L;
+
+    public static final String SECKILL_STOCK_KEY = "seckill:stock:";
+    public static final String SECKILL_ORDER_KEY = "seckill:order:";
+    public static final String SECKILL_STOCK_LOCK_KEY = "lock:seckill:stock:";
+
+    public static final String RATE_LIMIT_KEY = "rate:limit:";
+    public static final String CACHE_REBUILD_RETRY_KEY = "cache:rebuild:retry:";
+}

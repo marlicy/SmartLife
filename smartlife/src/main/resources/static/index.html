@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartLife 测试前端</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --border: #e5e7eb;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .hero {
+      background: linear-gradient(135deg, #1d4ed8, #6366f1);
+      color: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.22);
+      margin-bottom: 20px;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: 28px; }
+    .hero p { margin: 0; opacity: .9; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    }
+    .card h2 { margin-top: 0; font-size: 18px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      font-size: 14px;
+      background: #fff;
+    }
+    textarea { min-height: 96px; resize: vertical; }
+    input:focus, textarea:focus { border-color: #93c5fd; box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .2s;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn.secondary { background: #111827; }
+    .btn.success { background: var(--success); }
+    .btn.danger { background: var(--danger); }
+    .btn.small { padding: 8px 12px; font-size: 13px; }
+    .result {
+      margin-top: 12px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 56px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .section { margin-top: 14px; }
+    .inline { display:flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .inline > * { flex: 1; }
+    .status { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>SmartLife 最小前端</h1>
+      <p>用于在浏览器里测试登录、商铺、秒杀、AI 聊天，以及观察 Kafka 异步行为。</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>1. 登录</h2>
+        <div class="section">
+          <input id="phone" placeholder="手机号，例如 13800000000" value="13800000000" />
+        </div>
+        <div class="section row">
+          <button class="btn" onclick="sendCode()">发送验证码</button>
+        </div>
+        <div class="section">
+          <input id="code" placeholder="验证码" />
+        </div>
+        <div class="section row">
+          <button class="btn success" onclick="login()">登录</button>
+        </div>
+        <div class="status">当前 token：<span id="tokenText">未登录</span></div>
+        <div id="loginResult" class="result"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. 商铺查询</h2>
+        <div class="section inline">
+          <input id="shopId" placeholder="商铺ID" value="1" />
+          <button class="btn" onclick="queryShop()">查询</button>
+        </div>
+        <div class="section row">
+          <textarea id="shopUpdateBody" placeholder='更新商铺 JSON，例如 {"id":1,"name":"新的店名"}'></textarea>
+        </div>
+        <div class="section row">
+          <button class="btn secondary" onclick="updateShop()">更新商铺</button>
+        </div>
+        <div id="shopResult" class="result"></div>
+      </div>
+
+      <div class="card">
+        <h2>3. 秒杀下单</h2>
+        <div class="section inline">
+          <input id="voucherId" placeholder="优惠券ID" value="1" />
+          <button class="btn danger" onclick="seckill()">秒杀</button>
+        </div>
+        <div class="muted">提示：重复点击同一个券，能看到一人一单和库存校验效果。</div>
+        <div id="seckillResult" class="result"></div>
+      </div>
+
+      <div class="card">
+        <h2>4. AI 客服</h2>
+        <div class="section">
+          <input id="sessionId" placeholder="会话ID" value="u1001" />
+        </div>
+        <div class="section">
+          <textarea id="chatMessage" placeholder="输入你要问 AI 的内容，例如：介绍一下这个平台"></textarea>
+        </div>
+        <div class="section row">
+          <button class="btn" onclick="chat()">发送</button>
+        </div>
+        <div id="chatResult" class="result"></div>
+      </div>
+
+      <div class="card">
+        <h2>5. Kafka 行为观察</h2>
+        <div class="muted">
+          你在前端点“秒杀”后，接口会先返回订单号，但真正写数据库是 Kafka 异步消费者做的。你可以刷新数据库表，或者看后端日志里的消费者输出，观察订单是否延迟落库。
+        </div>
+        <div class="section row">
+          <button class="btn secondary" onclick="queryShop()">顺手再查一次商铺</button>
+        </div>
+        <div class="muted">也可以在虚拟机 Kafka 里看 topic 消息积压和消费者日志。</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = 'http://localhost:8082';
+
+    function saveToken(token) {
+      localStorage.setItem('token', token);
+      document.getElementById('tokenText').innerText = token || '未登录';
+    }
+
+    function getToken() {
+      return localStorage.getItem('token') || '';
+    }
+
+    function authHeaders(extra = {}) {
+      const token = getToken();
+      return Object.assign({
+        'Content-Type': 'application/json',
+        'authorization': token
+      }, extra);
+    }
+
+    async function request(url, options = {}) {
+      const response = await fetch(url, options);
+      return await response.json();
+    }
+
+    async function sendCode() {
+      const phone = document.getElementById('phone').value.trim();
+      const result = await request(`${baseUrl}/user/code?phone=${encodeURIComponent(phone)}`, {
+        method: 'POST'
+      });
+      document.getElementById('loginResult').innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function login() {
+      const phone = document.getElementById('phone').value.trim();
+      const code = document.getElementById('code').value.trim();
+      const result = await request(`${baseUrl}/user/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code })
+      });
+      document.getElementById('loginResult').innerText = JSON.stringify(result, null, 2);
+      if (result.success && result.data) {
+        saveToken(result.data);
+      }
+    }
+
+    async function queryShop() {
+      const id = document.getElementById('shopId').value.trim();
+      const result = await request(`${baseUrl}/shop/${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: authHeaders()
+      });
+      document.getElementById('shopResult').innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function updateShop() {
+      let bodyText = document.getElementById('shopUpdateBody').value.trim();
+      if (!bodyText) {
+        bodyText = JSON.stringify({ id: Number(document.getElementById('shopId').value || 1), name: '新的商铺名称' });
+      }
+      const result = await request(`${baseUrl}/shop`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: bodyText
+      });
+      document.getElementById('shopResult').innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function seckill() {
+      const id = document.getElementById('voucherId').value.trim();
+      const result = await request(`${baseUrl}/voucher-order/seckill/${encodeURIComponent(id)}`, {
+        method: 'POST',
+        headers: authHeaders()
+      });
+      document.getElementById('seckillResult').innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function chat() {
+      const sessionId = document.getElementById('sessionId').value.trim();
+      const message = document.getElementById('chatMessage').value.trim();
+      const result = await request(`${baseUrl}/chat`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ sessionId, message })
+      });
+      document.getElementById('chatResult').innerText = JSON.stringify(result, null, 2);
+    }
+
+    document.getElementById('tokenText').innerText = getToken() || '未登录';
+    if (getToken()) {
+      document.getElementById('tokenText').innerText = getToken();
+    }
+  </script>
+</body>
+</html>
