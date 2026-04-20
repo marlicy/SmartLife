@@ -21,6 +21,8 @@ public class RedisConstants {
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
     public static final String SECKILL_ORDER_KEY = "seckill:order:";
     public static final String SECKILL_STOCK_LOCK_KEY = "lock:seckill:stock:";
+    public static final String BLOG_LIKED_KEY = "blog:liked:";
+    public static final String FEED_KEY = "feed:";
 
     public static final String RATE_LIMIT_KEY = "rate:limit:";
     public static final String CACHE_REBUILD_RETRY_KEY = "cache:rebuild:retry:";
